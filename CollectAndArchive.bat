@@ -2,8 +2,8 @@
 setlocal enabledelayedexpansion
 
 :: パス設定
-set "source_folder=C:\Users\austr\Downloads\収集ファイル"
-set "base_target=C:\Users\austr\OneDrive\デスクトップ\収集データ"
+set "source_folder=%USERPROFILE%\Downloads\収集ファイル"
+set "base_target=%USERPROFILE%\OneDrive\デスクトップ\収集データ"
 
 :: CSVファイルをループ処理
 for %%F in ("%source_folder%\*.csv") do (
