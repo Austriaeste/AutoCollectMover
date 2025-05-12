@@ -33,7 +33,7 @@ for %%F in ("%source_folder%\*.csv") do (
         set "period_folder=!year!-0201-0210"
     ) else if !start_mmdd! geq 0211 if !start_mmdd! leq 0220 (
         set "period_folder=!year!-0211-0220"
-    ) else if !start_mmdd! geq 0221 if !start_mmdd! leq 0229 (
+    ) else if !start_mmdd! geq 0221 if !start_mmdd! leq 0228 (
         set "period_folder=!year!-0221-0228"
     ) else if !start_mmdd! geq 0301 if !start_mmdd! leq 0310 (
         set "period_folder=!year!-0301-0310"
