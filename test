@@ -1,0 +1,31 @@
+@echo off
+setlocal
+
+:: 共有フォルダのパス（環境に合わせて変更）
+set "target_folder=\\server\share\収集データ\test_dir"
+set "test_file=\\server\share\収集データ\test.txt"
+
+:: ディレクトリ作成をテスト
+echo ディレクトリ作成を試みます: %target_folder%
+mkdir "%target_folder%"
+if errorlevel 1 (
+    echo エラー: ディレクトリ作成に失敗しました（権限不足の可能性）
+) else (
+    echo 成功: ディレクトリ %target_folder% を作成しました
+    :: テスト用ディレクトリを削除
+    rmdir "%target_folder%"
+)
+
+:: ファイル書き込みをテスト
+echo ファイル書き込みを試みます: %test_file%
+echo test > "%test_file%"
+if errorlevel 1 (
+    echo エラー: ファイル書き込みに失敗しました（権限不足の可能性）
+) else (
+    echo 成功: ファイル %test_file% を書き込みました
+    :: テスト用ファイルを削除
+    del "%test_file%"
+)
+
+pause
+exit /b
