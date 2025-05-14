@@ -3,14 +3,18 @@ setlocal enabledelayedexpansion
 
 :: パス設定
 set "source_folder=%USERPROFILE%\Downloads\収集ファイル"
-set "base_target=%USERPROFILE%\OneDrive\デスクトップ\収集データ"
+set "temp_base=%USERPROFILE%\Downloads\収集一時格納"
+set "final_target=%USERPROFILE%\OneDrive\デスクトップ\収集データ"
+
+:: 一時格納フォルダ初期化
+if exist "%temp_base%" rd /s /q "%temp_base%"
+mkdir "%temp_base%"
 
 :: CSVファイルをループ処理
 for %%F in ("%source_folder%\*.csv") do (
     set "filename=%%~nxF"
     echo ファイル名: !filename!
 
-    :: ファイル名を一時ファイルに出力して読み込み（ネスト対策）
     echo !filename! > tmp_filename.txt
     for /f "tokens=1,2 delims=_" %%A in (tmp_filename.txt) do (
         set "start=%%A"
@@ -22,7 +26,7 @@ for %%F in ("%source_folder%\*.csv") do (
     set "start_mmdd=!start:~4,4!"
     set "end_mmdd=!end:~4,4!"
 
-    :: 期間フォルダの設定（1月から12月までを10日単位で区切る）
+    :: 期間フォルダの判定（中略せずフル記述）
     if !start_mmdd! geq 0101 if !start_mmdd! leq 0110 (
         set "period_folder=!year!-0101-0110"
     ) else if !start_mmdd! geq 0111 if !start_mmdd! leq 0120 (
@@ -33,7 +37,7 @@ for %%F in ("%source_folder%\*.csv") do (
         set "period_folder=!year!-0201-0210"
     ) else if !start_mmdd! geq 0211 if !start_mmdd! leq 0220 (
         set "period_folder=!year!-0211-0220"
-    ) else if !start_mmdd! geq 0221 if !start_mmdd! leq 0228 (
+    ) else if !start_mmdd! geq 0221 if !start_mmdd! leq 0229 (
         set "period_folder=!year!-0221-0228"
     ) else if !start_mmdd! geq 0301 if !start_mmdd! leq 0310 (
         set "period_folder=!year!-0301-0310"
@@ -101,15 +105,23 @@ for %%F in ("%source_folder%\*.csv") do (
         exit /b
     )
 
-    set "target_folder=%base_target%\!year!年度\!period_folder!"
+    set "local_target=%temp_base%\!year!年度\!period_folder!"
+    if not exist "!local_target!" mkdir "!local_target!"
 
-    if not exist "!target_folder!" (
-        mkdir "!target_folder!"
-    )
-
-    copy "%%F" "!target_folder!\!filename!" /Y
-    echo 完了：!target_folder!\!filename! に移動しました。
+    copy "%%F" "!local_target!\!filename!" /Y
+    echo ローカル格納：!local_target!\!filename!
 )
+
+:: 最後にまとめてローカル→本番へコピー
+echo ------------------------------------------------------------
+echo 本番へ一括コピー中...
+robocopy "%temp_base%" "%final_target%" /E /NFL /NDL /NP /NJH /NJS
+echo コピー完了
+
+:: 一時フォルダ削除
+echo 一時フォルダを削除中: %temp_base%
+rd /s /q "%temp_base%"
+echo 削除完了
 
 pause
 exit /b
